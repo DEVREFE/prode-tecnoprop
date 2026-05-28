@@ -1,0 +1,37 @@
+# ================================================================
+# OPCIÓN B: Redirect directo en .htaccess de WordPress
+# (Si no querés instalar el plugin, agregá estas líneas
+#  al .htaccess existente, ANTES de las reglas de WordPress)
+# ================================================================
+
+# Redirect tecnoprop.ar/prode/* → prode.tecnoprop.ar/*
+# Preserva query strings (?ref=ABC123, etc.)
+
+RewriteEngine On
+
+# Redirect /prode con query string
+RewriteCond %{QUERY_STRING} .+
+RewriteRule ^prode/?(.*)$ https://prode.tecnoprop.ar/$1?%{QUERY_STRING} [R=301,L]
+
+# Redirect /prode sin query string
+RewriteRule ^prode/?(.*)$ https://prode.tecnoprop.ar/$1 [R=301,L]
+
+# ================================================================
+# OPCIÓN C: Si usás Nginx en lugar de Apache
+# Agregar en el server block de tecnoprop.ar:
+# ================================================================
+
+# location ^~ /prode {
+#     rewrite ^/prode/?(.*)$ https://prode.tecnoprop.ar/$1 permanent;
+# }
+
+# ================================================================
+# CONFIGURACIÓN DNS
+# Para que prode.tecnoprop.ar funcione, agregar en tu DNS:
+#
+#   Tipo: CNAME
+#   Host: prode
+#   Valor: cname.vercel-dns.com
+#
+# En Vercel Dashboard: Settings > Domains > Add "prode.tecnoprop.ar"
+# ================================================================

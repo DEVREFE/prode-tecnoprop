@@ -1,0 +1,25 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "*/5 * * * *",
+      "description": "Cada 5 minutos: bloquear partidos iniciados, sincronizar resultados en vivo, enviar recordatorios"
+    },
+    {
+      "path": "/api/cron/weekly",
+      "schedule": "0 12 * * 1",
+      "description": "Lunes 9am AR: email semanal con ranking a todos los usuarios"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    }
+  ]
+}
