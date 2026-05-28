@@ -155,7 +155,7 @@ function MatchAdminRow({ match }: { match: any }) {
 
     if (!error && status === 'finished' && scoreHome !== '' && scoreAway !== '') {
       // Disparar cálculo de puntos
-      const { error: rpcErr } = await supabase.rpc('score_match', { p_match_id: match.id })
+      const { error: rpcErr } = await (supabase as any).rpc('score_match', { p_match_id: match.id })
       if (!rpcErr) toast.success(`Puntos calculados: ${match.team_home} ${scoreHome} - ${scoreAway} ${match.team_away}`)
       else toast.error('Error calculando puntos: ' + rpcErr.message)
     } else if (!error) {
@@ -281,7 +281,7 @@ function ScoringPanel({ matches }: { matches: any[] }) {
   const handleScore = async (matchId: string, matchLabel: string) => {
     setScoring(matchId)
     const supabase = createClient()
-    const { data, error } = await supabase.rpc('score_match', { p_match_id: matchId })
+    const { data, error } = await (supabase as any).rpc('score_match', { p_match_id: matchId })
     setScoring(null)
     if (error) { toast.error('Error: ' + error.message); return }
     toast.success(`${matchLabel} — ${data} pronósticos puntuados`)
