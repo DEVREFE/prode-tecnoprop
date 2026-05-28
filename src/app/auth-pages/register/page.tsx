@@ -141,7 +141,13 @@ function RegisterContent() {
     }
 
     setLoading(false)
-    setDone(true)
+    if (authData.session) {
+      toast.success('¡Cuenta creada e inicio de sesión exitoso! ⚽')
+      router.push('/dashboard')
+      router.refresh()
+    } else {
+      setDone(true)
+    }
   }
 
   if (done) {
