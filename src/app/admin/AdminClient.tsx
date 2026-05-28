@@ -232,7 +232,7 @@ function UserAdminRow({ user }: { user: any }) {
 
   const handleSuspend = async () => {
     const supabase = createClient()
-    await supabase.from('users').update({ status: 'suspended' }).eq('id', user.id)
+    await (supabase.from('users') as any).update({ status: 'suspended' }).eq('id', user.id)
     setSuspended(true)
     toast.success('Usuario suspendido')
   }
