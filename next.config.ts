@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'media.api-sports.io' },
     ],
   },
+  async rewrites() {
+    return [
+      { source: '/login', destination: '/auth-pages/login' },
+      { source: '/register', destination: '/auth-pages/register' },
+    ]
+  },
   async headers() {
     return [
       {

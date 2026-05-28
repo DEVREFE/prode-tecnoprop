@@ -33,13 +33,13 @@ export default function LigasClient({ myLeagues, userId }: LigasClientProps) {
       name: newName.trim(),
       description: newDesc.trim() || null,
       owner_id: userId,
-    })
+    } as any)
     if (error) { toast.error(error.message); setCreating(false); return }
     // También agregar al creador como miembro
     const { data: league } = await supabase
       .from('leagues').select('id').eq('owner_id', userId).order('created_at', { ascending: false }).limit(1).single()
     if (league) {
-      await supabase.from('league_members').insert({ league_id: league.id, user_id: userId })
+      await supabase.from('league_members').insert({ league_id: (league as any).id, user_id: userId } as any)
     }
     toast.success('¡Liga creada!')
     setCreating(false)

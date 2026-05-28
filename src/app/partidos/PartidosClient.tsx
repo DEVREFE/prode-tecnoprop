@@ -186,7 +186,7 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
         top_scorer: scorer || null,
         final_score_home: finalHome !== '' ? parseInt(finalHome) : null,
         final_score_away: finalAway !== '' ? parseInt(finalAway) : null,
-      }, { onConflict: 'user_id' })
+      } as any, { onConflict: 'user_id' })
     setSaving(false)
     if (error) { toast.error('Error al guardar'); return }
     setSaved(true)

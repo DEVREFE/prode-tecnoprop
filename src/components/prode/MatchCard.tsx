@@ -55,7 +55,7 @@ export default function MatchCard({ match, userId, onPredictionSaved }: MatchCar
 
     const { error } = await supabase
       .from('predictions')
-      .upsert(payload, { onConflict: 'user_id,match_id' })
+      .upsert(payload as any, { onConflict: 'user_id,match_id' })
 
     setSaving(false)
 

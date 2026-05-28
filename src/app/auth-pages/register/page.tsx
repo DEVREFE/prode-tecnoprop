@@ -115,7 +115,7 @@ function RegisterContent() {
 
     const { error: profileError } = await supabase
       .from('users')
-      .insert(profilePayload)
+      .insert(profilePayload as any)
 
     if (profileError) {
       console.error('Profile error:', profileError)
@@ -134,9 +134,9 @@ function RegisterContent() {
 
       if (referrer) {
         await supabase.from('referrals').insert({
-          referrer_id: referrer.id,
+          referrer_id: (referrer as any).id,
           referred_id: authData.user.id,
-        })
+        } as any)
       }
     }
 
