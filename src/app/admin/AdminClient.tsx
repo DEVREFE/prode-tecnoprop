@@ -149,8 +149,7 @@ function MatchAdminRow({ match }: { match: any }) {
     if (scoreAway !== '') updates.score_away = parseInt(scoreAway)
     if (status === 'live' || status === 'finished') updates.is_locked = true
 
-    const { error } = await supabase
-      .from('matches')
+    const { error } = await (supabase.from('matches') as any)
       .update(updates)
       .eq('id', match.id)
 
