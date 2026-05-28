@@ -1,3 +1,4 @@
+// Supabase browser client instance
 import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from './database.types'
 
