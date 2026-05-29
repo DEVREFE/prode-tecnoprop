@@ -96,7 +96,7 @@ export default function MatchCard({ match, userId, onPredictionSaved }: MatchCar
             Cerrado
           </span>
         ) : (
-          <span className="text-xs text-white/40 font-medium">
+          <span className="text-xs text-white/40 font-medium" suppressHydrationWarning>
             {formatMatchDate(match.match_date)}
           </span>
         )}
@@ -142,7 +142,9 @@ export default function MatchCard({ match, userId, onPredictionSaved }: MatchCar
           ) : (
             <>
               <span className="text-white/25 font-bold text-lg">VS</span>
-              <span className="text-[10px] text-white/25">{match.match_date ? new Date(match.match_date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : ''}</span>
+              <span className="text-[10px] text-white/25" suppressHydrationWarning>
+                {match.match_date ? new Date(match.match_date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : ''}
+              </span>
             </>
           )}
         </div>

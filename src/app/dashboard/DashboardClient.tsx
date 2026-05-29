@@ -284,7 +284,7 @@ export default function DashboardClient({
                         <span className="text-white/25 mx-2">vs</span>
                         {match?.team_away} {match?.flag_away}
                       </div>
-                      <div className="text-xs text-white/30 mt-0.5">
+                      <div className="text-xs text-white/30 mt-0.5" suppressHydrationWarning>
                         {match?.match_date && formatMatchDate(match.match_date)}
                       </div>
                     </div>
@@ -392,7 +392,7 @@ export default function DashboardClient({
                         {log.description && (
                           <div className="text-xs text-white/30 mt-0.5 truncate">{log.description}</div>
                         )}
-                        <div className="text-xs text-white/20 mt-0.5">
+                        <div className="text-xs text-white/20 mt-0.5" suppressHydrationWarning>
                           {new Date(log.created_at).toLocaleString('es-AR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })}
                         </div>
                       </div>
@@ -472,7 +472,7 @@ export default function DashboardClient({
                         <div className="text-sm font-semibold">
                           {ref.users?.nombre} {ref.users?.apellido}
                         </div>
-                        <div className="text-xs text-white/30">
+                        <div className="text-xs text-white/30" suppressHydrationWarning>
                           {ref.users?.created_at && new Date(ref.users.created_at).toLocaleDateString('es-AR')}
                         </div>
                       </div>
