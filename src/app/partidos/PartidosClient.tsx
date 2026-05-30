@@ -176,21 +176,58 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
     if (!userId) { toast.error('Ingresá para guardar'); return }
     if (!champ)  { toast.error('Ingresá el campeón del mundial'); return }
     setSaving(true)
-    const supabase = createClient()
-    const { error } = await supabase
-      .from('special_predictions')
-      .upsert({
+    try {
+      const supabase = createClient()
+
+      const payload = {
         user_id: userId,
         champion_team: champ,
         runner_up_team: runner || null,
         top_scorer: scorer || null,
         final_score_home: finalHome !== '' ? parseInt(finalHome) : null,
         final_score_away: finalAway !== '' ? parseInt(finalAway) : null,
-      } as any, { onConflict: 'user_id' })
-    setSaving(false)
-    if (error) { toast.error('Error al guardar'); return }
-    setSaved(true)
-    toast.success('¡Predicciones especiales guardadas! ⭐')
+      }
+
+      // Verificar si ya existe (evita upsert + RLS separadas)
+      const { data: existing } = await supabase
+        .from('special_predictions')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle()
+
+      let error
+      if (existing) {
+        const res = await supabase
+          .from('special_predictions')
+          .update({
+            champion_team: payload.champion_team,
+            runner_up_team: payload.runner_up_team,
+            top_scorer: payload.top_scorer,
+            final_score_home: payload.final_score_home,
+            final_score_away: payload.final_score_away,
+          })
+          .eq('id', existing.id)
+        error = res.error
+      } else {
+        const res = await supabase
+          .from('special_predictions')
+          .insert(payload)
+        error = res.error
+      }
+
+      if (error) {
+        console.error('Error guardando predicciones especiales:', error)
+        toast.error(`Error al guardar: ${error.message}`)
+        return
+      }
+      setSaved(true)
+      toast.success('¡Predicciones especiales guardadas! ⭐')
+    } catch (err) {
+      console.error('Excepción guardando predicciones especiales:', err)
+      toast.error('Error inesperado. Intentá de nuevo.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (

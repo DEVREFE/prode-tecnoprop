@@ -44,29 +44,56 @@ export default function MatchCard({ match, userId, onPredictionSaved }: MatchCar
     }
 
     setSaving(true)
-    const supabase = createClient()
+    try {
+      const supabase = createClient()
 
-    const payload = {
-      user_id: userId,
-      match_id: match.id,
-      pred_home: parseInt(predHome),
-      pred_away: parseInt(predAway),
+      const payload = {
+        user_id: userId,
+        match_id: match.id,
+        pred_home: parseInt(predHome),
+        pred_away: parseInt(predAway),
+      }
+
+      // Verificar si ya existe una predicción para este partido
+      // (evita upsert que falla silenciosamente con RLS separadas para INSERT/UPDATE)
+      const { data: existing } = await supabase
+        .from('predictions')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('match_id', match.id)
+        .maybeSingle()
+
+      let error
+      if (existing) {
+        // Actualizar predicción existente
+        const res = await supabase
+          .from('predictions')
+          .update({ pred_home: payload.pred_home, pred_away: payload.pred_away })
+          .eq('id', existing.id)
+        error = res.error
+      } else {
+        // Insertar nueva predicción
+        const res = await supabase
+          .from('predictions')
+          .insert(payload)
+        error = res.error
+      }
+
+      if (error) {
+        console.error('Error guardando pronóstico:', error)
+        toast.error(`Error al guardar: ${error.message}`)
+        return
+      }
+
+      setSaved(true)
+      toast.success('¡Pronóstico guardado! 🎯')
+      onPredictionSaved?.(match.id, parseInt(predHome), parseInt(predAway))
+    } catch (err) {
+      console.error('Excepción guardando pronóstico:', err)
+      toast.error('Error inesperado. Intentá de nuevo.')
+    } finally {
+      setSaving(false)
     }
-
-    const { error } = await supabase
-      .from('predictions')
-      .upsert(payload as any, { onConflict: 'user_id,match_id' })
-
-    setSaving(false)
-
-    if (error) {
-      toast.error('Error al guardar. Intentá de nuevo.')
-      return
-    }
-
-    setSaved(true)
-    toast.success('¡Pronóstico guardado! 🎯')
-    onPredictionSaved?.(match.id, parseInt(predHome), parseInt(predAway))
   }
 
   return (
