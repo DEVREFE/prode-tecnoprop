@@ -205,7 +205,7 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
             top_scorer: payload.top_scorer,
             final_score_home: payload.final_score_home,
             final_score_away: payload.final_score_away,
-          })
+          } as any)
           .eq('id', existing.id)
         error = res.error
       } else {
