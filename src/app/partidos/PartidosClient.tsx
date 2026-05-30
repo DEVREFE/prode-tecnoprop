@@ -189,14 +189,14 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
       }
 
       // Verificar si ya existe (evita upsert + RLS separadas)
-      const { data: existing } = await (supabase.from('special_predictions') as any)
+      const { data: existing } = await supabase.from('special_predictions')
         .select('id')
         .eq('user_id', userId)
         .maybeSingle()
 
       let error
       if (existing) {
-        const res = await (supabase.from('special_predictions') as any)
+        const res = await supabase.from('special_predictions')
           .update({
             champion_team: payload.champion_team,
             runner_up_team: payload.runner_up_team,
@@ -207,7 +207,7 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
           .eq('id', existing.id)
         error = res.error
       } else {
-        const res = await (supabase.from('special_predictions') as any)
+        const res = await supabase.from('special_predictions')
           .insert(payload)
         error = res.error
       }
