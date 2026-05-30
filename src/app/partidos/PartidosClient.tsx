@@ -189,8 +189,7 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
       }
 
       // Verificar si ya existe (evita upsert + RLS separadas)
-      const { data: existing } = await supabase
-        .from('special_predictions')
+      const { data: existing } = await (supabase.from('special_predictions') as any)
         .select('id')
         .eq('user_id', userId)
         .maybeSingle()
