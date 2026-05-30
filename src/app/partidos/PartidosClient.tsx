@@ -197,20 +197,18 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
 
       let error
       if (existing) {
-        const res = await supabase
-          .from('special_predictions')
+        const res = await (supabase.from('special_predictions') as any)
           .update({
             champion_team: payload.champion_team,
             runner_up_team: payload.runner_up_team,
             top_scorer: payload.top_scorer,
             final_score_home: payload.final_score_home,
             final_score_away: payload.final_score_away,
-          } as any)
+          })
           .eq('id', existing.id)
         error = res.error
       } else {
-        const res = await supabase
-          .from('special_predictions')
+        const res = await (supabase.from('special_predictions') as any)
           .insert(payload)
         error = res.error
       }
