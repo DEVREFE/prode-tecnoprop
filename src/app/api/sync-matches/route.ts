@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Obtener fixture del Mundial 2026 de API-Football
+    // Obtener fixture del Mundial 2022 de API-Football para pruebas (2026 bloqueado en plan gratis temporalmente)
     const apiRes = await fetch(
-      'https://v3.football.api-sports.io/fixtures?league=1&season=2026',
+      'https://v3.football.api-sports.io/fixtures?league=1&season=2022',
       {
         headers: {
           'x-apisports-key': process.env.API_FOOTBALL_KEY!,
@@ -30,7 +30,11 @@ export async function GET(request: NextRequest) {
       throw new Error(`API-Football error: ${apiRes.status}`)
     }
 
-    const { response: fixtures } = await apiRes.json()
+    const jsonRes = await apiRes.json()
+    if (jsonRes.errors && Object.keys(jsonRes.errors).length > 0) {
+      throw new Error(`API-Sports Error: ${JSON.stringify(jsonRes.errors)}`)
+    }
+    const fixtures = jsonRes.response
     const supabase = createAdminClient()
 
     let updated = 0
