@@ -235,6 +235,11 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
       }
       setSaved(true)
       toast.success('¡Predicciones especiales guardadas! ⭐')
+      
+      const { useRouter } = require('next/navigation')
+      // router.refresh no está disponible aquí directamente sin el hook
+      // pero podemos forzar la recarga de la página si es necesario
+      window.location.reload()
     } catch (err) {
       console.error('Excepción guardando predicciones especiales:', err)
       toast.error('Error inesperado. Intentá de nuevo.')

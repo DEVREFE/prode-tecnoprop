@@ -197,7 +197,7 @@ export default function DashboardClient({
                 ))}
               </div>
               {!specialPred && (
-                <Link href="/partidos?tab=especiales" className="btn-brand w-full text-center text-sm py-2.5 mt-4 block">
+                <Link href="/partidos?tab=special" className="btn-brand w-full text-center text-sm py-2.5 mt-4 block">
                   Completar predicciones especiales →
                 </Link>
               )}
