@@ -285,10 +285,12 @@ export default function DashboardClient({
                       <div className="text-xs text-white/30 mb-1">
                         {match?.group_name ?? match?.phase} · {match?.stadium}
                       </div>
-                      <div className="text-sm font-bold">
-                        {match?.flag_home} {match?.team_home}
-                        <span className="text-white/25 mx-2">vs</span>
-                        {match?.team_away} {match?.flag_away}
+                      <div className="text-sm font-bold flex items-center gap-2">
+                        {match?.flag_home?.startsWith('http') ? <img src={match.flag_home} className="w-4 h-4 object-contain inline-block" alt="" /> : match?.flag_home} 
+                        {match?.team_home}
+                        <span className="text-white/25 mx-1">vs</span>
+                        {match?.team_away}
+                        {match?.flag_away?.startsWith('http') ? <img src={match.flag_away} className="w-4 h-4 object-contain inline-block" alt="" /> : match?.flag_away}
                       </div>
                       <div className="text-xs text-white/30 mt-0.5" suppressHydrationWarning>
                         {match?.match_date && formatMatchDate(match.match_date)}

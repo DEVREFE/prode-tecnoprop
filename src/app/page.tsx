@@ -17,6 +17,7 @@ async function getHomeData() {
       .from('matches')
       .select('*')
       .in('status', ['scheduled', 'live'])
+      .gte('match_date', new Date().toISOString())
       .order('match_date', { ascending: true })
       .limit(4),
     supabase
