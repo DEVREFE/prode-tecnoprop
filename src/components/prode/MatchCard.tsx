@@ -133,8 +133,12 @@ export default function MatchCard({ match, userId, onPredictionSaved }: MatchCar
       <div className="flex items-center gap-3 mb-4">
         {/* Team Home */}
         <div className="flex-1 flex flex-col items-center gap-2">
-          <div className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.06] flex items-center justify-center text-3xl">
-            {match.flag_home ?? '🏳️'}
+          <div className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.06] flex items-center justify-center text-3xl overflow-hidden">
+            {match.flag_home?.startsWith('http') ? (
+              <img src={match.flag_home} alt={match.team_home} className="w-full h-full object-contain p-1" />
+            ) : (
+              match.flag_home ?? '🏳️'
+            )}
           </div>
           <span className="text-xs font-bold text-center leading-tight line-clamp-1">
             {match.team_home}
@@ -178,8 +182,12 @@ export default function MatchCard({ match, userId, onPredictionSaved }: MatchCar
 
         {/* Team Away */}
         <div className="flex-1 flex flex-col items-center gap-2">
-          <div className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.06] flex items-center justify-center text-3xl">
-            {match.flag_away ?? '🏳️'}
+          <div className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.06] flex items-center justify-center text-3xl overflow-hidden">
+            {match.flag_away?.startsWith('http') ? (
+              <img src={match.flag_away} alt={match.team_away} className="w-full h-full object-contain p-1" />
+            ) : (
+              match.flag_away ?? '🏳️'
+            )}
           </div>
           <span className="text-xs font-bold text-center leading-tight line-clamp-1">
             {match.team_away}
