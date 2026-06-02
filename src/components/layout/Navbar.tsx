@@ -47,7 +47,7 @@ export default function Navbar() {
             status: 'active',
             role: 'user',
             created_at: new Date().toISOString()
-          })
+          } as UserType)
         }
       }
     }
@@ -75,7 +75,7 @@ export default function Navbar() {
               status: 'active',
               role: 'user',
               created_at: new Date().toISOString()
-            })
+            } as UserType)
           }
         } else {
           setUser(null)
