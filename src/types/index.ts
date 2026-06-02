@@ -12,7 +12,10 @@ export type PointReason =
   | 'correct_draw'
   | 'champion_bonus'
   | 'runner_up_bonus'
+  | 'third_place_bonus'
   | 'top_scorer_bonus'
+  | 'best_player_bonus'
+  | 'best_goalkeeper_bonus'
   | 'final_exact_bonus'
   | 'referral_bonus'
 
@@ -80,7 +83,10 @@ export interface SpecialPrediction {
   user_id: string
   champion_team: string | null
   runner_up_team: string | null
+  third_place_team: string | null
   top_scorer: string | null
+  best_player: string | null
+  best_goalkeeper: string | null
   final_score_home: number | null
   final_score_away: number | null
   points_earned: number
@@ -195,7 +201,10 @@ export const POINTS_CONFIG = {
   CORRECT_DRAW: 1,
   CHAMPION_BONUS: 10,
   RUNNER_UP_BONUS: 5,
+  THIRD_PLACE_BONUS: 5,
   TOP_SCORER_BONUS: 5,
+  BEST_PLAYER_BONUS: 5,
+  BEST_GOALKEEPER_BONUS: 5,
   FINAL_EXACT_BONUS: 5,
   REFERRAL_BONUS: 1,
 } as const

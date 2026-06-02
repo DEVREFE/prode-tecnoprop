@@ -166,7 +166,10 @@ interface SpecialPredictionsProps {
 function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
   const [champ, setChamp]         = useState(specialPred?.champion_team ?? '')
   const [runner, setRunner]       = useState(specialPred?.runner_up_team ?? '')
+  const [thirdPlace, setThirdPlace] = useState(specialPred?.third_place_team ?? '')
   const [scorer, setScorer]       = useState(specialPred?.top_scorer ?? '')
+  const [bestPlayer, setBestPlayer] = useState(specialPred?.best_player ?? '')
+  const [bestGoalkeeper, setBestGoalkeeper] = useState(specialPred?.best_goalkeeper ?? '')
   const [finalHome, setFinalHome] = useState(specialPred?.final_score_home?.toString() ?? '')
   const [finalAway, setFinalAway] = useState(specialPred?.final_score_away?.toString() ?? '')
   const [saving, setSaving]       = useState(false)
@@ -183,7 +186,10 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
         user_id: userId,
         champion_team: champ,
         runner_up_team: runner || null,
+        third_place_team: thirdPlace || null,
         top_scorer: scorer || null,
+        best_player: bestPlayer || null,
+        best_goalkeeper: bestGoalkeeper || null,
         final_score_home: finalHome !== '' ? parseInt(finalHome) : null,
         final_score_away: finalAway !== '' ? parseInt(finalAway) : null,
       }
@@ -200,7 +206,10 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
           .update({
             champion_team: payload.champion_team,
             runner_up_team: payload.runner_up_team,
+            third_place_team: payload.third_place_team,
             top_scorer: payload.top_scorer,
+            best_player: payload.best_player,
+            best_goalkeeper: payload.best_goalkeeper,
             final_score_home: payload.final_score_home,
             final_score_away: payload.final_score_away,
           })
@@ -264,6 +273,20 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
             />
           </div>
 
+          {/* Tercer puesto */}
+          <div>
+            <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
+              🥉 Tercer puesto <span className="text-gold">+5 pts</span>
+            </label>
+            <input
+              value={thirdPlace}
+              onChange={e => { setThirdPlace(e.target.value); setSaved(false) }}
+              placeholder="Ej: Croacia"
+              disabled={!!specialPred}
+              className="input-dark disabled:opacity-40 disabled:cursor-not-allowed"
+            />
+          </div>
+
           {/* Goleador */}
           <div>
             <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
@@ -273,6 +296,34 @@ function SpecialPredictions({ userId, specialPred }: SpecialPredictionsProps) {
               value={scorer}
               onChange={e => { setScorer(e.target.value); setSaved(false) }}
               placeholder="Ej: Mbappé"
+              disabled={!!specialPred}
+              className="input-dark disabled:opacity-40 disabled:cursor-not-allowed"
+            />
+          </div>
+
+          {/* Mejor jugador */}
+          <div>
+            <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
+              🌟 Mejor jugador <span className="text-gold">+5 pts</span>
+            </label>
+            <input
+              value={bestPlayer}
+              onChange={e => { setBestPlayer(e.target.value); setSaved(false) }}
+              placeholder="Ej: Messi"
+              disabled={!!specialPred}
+              className="input-dark disabled:opacity-40 disabled:cursor-not-allowed"
+            />
+          </div>
+
+          {/* Mejor arquero */}
+          <div>
+            <label className="block text-xs font-bold text-white/50 uppercase tracking-widest mb-2">
+              🧤 Mejor arquero <span className="text-gold">+5 pts</span>
+            </label>
+            <input
+              value={bestGoalkeeper}
+              onChange={e => { setBestGoalkeeper(e.target.value); setSaved(false) }}
+              placeholder="Ej: Dibu Martínez"
               disabled={!!specialPred}
               className="input-dark disabled:opacity-40 disabled:cursor-not-allowed"
             />

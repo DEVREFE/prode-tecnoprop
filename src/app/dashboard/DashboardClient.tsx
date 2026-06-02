@@ -35,7 +35,10 @@ const REASON_LABELS: Record<string, { label: string; color: string }> = {
   correct_draw:        { label: '🤝 Empate correcto',    color: 'text-celeste'   },
   champion_bonus:      { label: '🏆 Campeón',            color: 'text-gold'      },
   runner_up_bonus:     { label: '🥈 Subcampeón',         color: 'text-gold'      },
+  third_place_bonus:   { label: '🥉 Tercer puesto',      color: 'text-gold'      },
   top_scorer_bonus:    { label: '⭐ Goleador',            color: 'text-gold'      },
+  best_player_bonus:   { label: '🌟 Mejor jugador',      color: 'text-gold'      },
+  best_goalkeeper_bonus: { label: '🧤 Mejor arquero',    color: 'text-gold'      },
   final_exact_bonus:   { label: '⚡ Final exacta',        color: 'text-gold'      },
   referral_bonus:      { label: '👥 Referido',            color: 'text-purple-400'},
 }
@@ -171,7 +174,10 @@ export default function DashboardClient({
                 {[
                   { label: 'Campeón del Mundial',       key: 'champion_team',    pts: '+10', value: specialPred?.champion_team },
                   { label: 'Subcampeón',                key: 'runner_up_team',   pts: '+5',  value: specialPred?.runner_up_team },
+                  { label: 'Tercer puesto',             key: 'third_place_team', pts: '+5',  value: specialPred?.third_place_team },
                   { label: 'Goleador del torneo',       key: 'top_scorer',       pts: '+5',  value: specialPred?.top_scorer },
+                  { label: 'Mejor jugador',             key: 'best_player',      pts: '+5',  value: specialPred?.best_player },
+                  { label: 'Mejor arquero',             key: 'best_goalkeeper',  pts: '+5',  value: specialPred?.best_goalkeeper },
                   { label: 'Marcador exacto de la Final', key: 'final_score',    pts: '+5',  value: specialPred?.final_score_home != null ? `${specialPred.final_score_home} - ${specialPred.final_score_away}` : null },
                 ].map(item => (
                   <div key={item.key} className={cn(

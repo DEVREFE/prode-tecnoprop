@@ -28,24 +28,37 @@ export default function LigasClient({ myLeagues, userId }: LigasClientProps) {
   const handleCreate = async () => {
     if (!newName.trim()) { toast.error('Ingresá un nombre para la liga'); return }
     setCreating(true)
-    const supabase = createClient()
-    const { error } = await supabase.from('leagues').insert({
-      name: newName.trim(),
-      description: newDesc.trim() || null,
-      owner_id: userId,
-    } as any)
-    if (error) { toast.error(error.message); setCreating(false); return }
-    // También agregar al creador como miembro
-    const { data: league } = await supabase
-      .from('leagues').select('id').eq('owner_id', userId).order('created_at', { ascending: false }).limit(1).single()
-    if (league) {
-      await supabase.from('league_members').insert({ league_id: (league as any).id, user_id: userId } as any)
+    try {
+      const supabase = createClient()
+      
+      // Insertar liga y devolver el ID creado
+      const { data: league, error } = await supabase.from('leagues').insert({
+        name: newName.trim(),
+        description: newDesc.trim() || null,
+        owner_id: userId,
+      } as any).select('id').single()
+      
+      if (error) throw error
+
+      // También agregar al creador como miembro
+      if (league) {
+        const { error: memberError } = await supabase.from('league_members').insert({ 
+          league_id: (league as any).id, 
+          user_id: userId 
+        } as any)
+        if (memberError) throw memberError
+      }
+
+      toast.success('¡Liga creada!')
+      setShowCreate(false)
+      setNewName(''); setNewDesc('')
+      router.refresh()
+    } catch (err: any) {
+      console.error('Error creando liga:', err)
+      toast.error(err.message || 'Error inesperado al crear la liga.')
+    } finally {
+      setCreating(false)
     }
-    toast.success('¡Liga creada!')
-    setCreating(false)
-    setShowCreate(false)
-    setNewName(''); setNewDesc('')
-    router.refresh()
   }
 
   const handleJoin = async () => {

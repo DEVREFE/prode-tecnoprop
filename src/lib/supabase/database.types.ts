@@ -176,7 +176,10 @@ export interface Database {
           user_id: string
           champion_team: string | null
           runner_up_team: string | null
+          third_place_team: string | null
           top_scorer: string | null
+          best_player: string | null
+          best_goalkeeper: string | null
           final_score_home: number | null
           final_score_away: number | null
           points_earned: number
@@ -188,7 +191,10 @@ export interface Database {
           user_id: string
           champion_team?: string | null
           runner_up_team?: string | null
+          third_place_team?: string | null
           top_scorer?: string | null
+          best_player?: string | null
+          best_goalkeeper?: string | null
           final_score_home?: number | null
           final_score_away?: number | null
           points_earned?: number
@@ -200,7 +206,10 @@ export interface Database {
           user_id?: string
           champion_team?: string | null
           runner_up_team?: string | null
+          third_place_team?: string | null
           top_scorer?: string | null
+          best_player?: string | null
+          best_goalkeeper?: string | null
           final_score_home?: number | null
           final_score_away?: number | null
           points_earned?: number
