@@ -25,7 +25,8 @@ export default function MatchCard({ match, userId, onPredictionSaved }: MatchCar
   const [saved, setSaved] = useState(!!match.prediction)
 
   const status = getMatchStatusLabel(match)
-  const isLocked = match.is_locked || match.status !== 'scheduled'
+  const isPastKickoff = new Date(match.match_date).getTime() <= Date.now()
+  const isLocked = match.is_locked || match.status !== 'scheduled' || isPastKickoff
   const isFinished = match.status === 'finished'
   const isLive = match.status === 'live'
 
@@ -40,6 +41,10 @@ export default function MatchCard({ match, userId, onPredictionSaved }: MatchCar
     }
     if (predHome === '' || predAway === '') {
       toast.error('Ingresá el resultado para los dos equipos')
+      return
+    }
+    if (new Date(match.match_date).getTime() <= Date.now()) {
+      toast.error('El partido ya empezó, no se pueden guardar pronósticos')
       return
     }
 

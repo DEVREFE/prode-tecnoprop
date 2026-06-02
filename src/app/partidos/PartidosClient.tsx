@@ -34,11 +34,18 @@ export default function PartidosClient({ matches, userId, specialPred }: Partido
 
   // Filtro activo
   const filtered = useMemo(() => {
-    return matches.filter((m: any) => {
+    let list = matches.filter((m: any) => {
       const statusOk = statusTab === 'all' || m.status === statusTab
       const phaseOk  = phaseFilter === 'all' || m.phase === phaseFilter
       return statusOk && phaseOk
     })
+
+    // Si estamos en "Próximos", mostrar solo los 16 partidos más cercanos para no saturar
+    if (statusTab === 'scheduled') {
+      list = list.sort((a: any, b: any) => new Date(a.match_date).getTime() - new Date(b.match_date).getTime()).slice(0, 16)
+    }
+
+    return list
   }, [matches, statusTab, phaseFilter])
 
   // Contar live
