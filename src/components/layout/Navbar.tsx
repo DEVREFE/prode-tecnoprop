@@ -79,6 +79,12 @@ export default function Navbar() {
           }
         } else {
           setUser(null)
+          // Si pierden la sesión (ej. expiró el token y falló el refresh), 
+          // los sacamos para que no queden en una pantalla fantasma cacheada
+          if (event === 'SIGNED_OUT') {
+            router.refresh()
+            router.push('/login')
+          }
         }
       }
     )
