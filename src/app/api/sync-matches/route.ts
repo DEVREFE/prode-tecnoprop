@@ -14,75 +14,64 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Obtener fixture del Mundial 2022 de API-Football para pruebas (2026 bloqueado en plan gratis temporalmente)
+    // Obtener fixture del Mundial 2026 de ESPN (Gratis)
     const apiRes = await fetch(
-      'https://v3.football.api-sports.io/fixtures?league=1&season=2022',
-      {
-        headers: {
-          'x-apisports-key': process.env.API_FOOTBALL_KEY!,
-          'x-apisports-host': 'v3.football.api-sports.io',
-        },
-        next: { revalidate: 300 }, // cache 5 minutos
-      }
+      'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719',
+      { next: { revalidate: 300 } }
     )
 
-    if (!apiRes.ok) {
-      throw new Error(`API-Football error: ${apiRes.status}`)
-    }
+    if (!apiRes.ok) throw new Error(`ESPN API error: ${apiRes.status}`)
 
     const jsonRes = await apiRes.json()
-    if (jsonRes.errors && Object.keys(jsonRes.errors).length > 0) {
-      throw new Error(`API-Sports Error: ${JSON.stringify(jsonRes.errors)}`)
-    }
-    const fixtures = jsonRes.response
+    const events = jsonRes.events || []
     const supabase = createAdminClient()
 
     let updated = 0
     let inserted = 0
 
-    for (const fixture of fixtures) {
-      const f = fixture.fixture
-      const teams = fixture.teams
-      const goals = fixture.goals
-      const league = fixture.league
+    for (const event of events) {
+      const comp = event.competitions[0]
+      if (!comp) continue
+
+      const homeCompetitor = comp.competitors.find((c: any) => c.homeAway === 'home')
+      const awayCompetitor = comp.competitors.find((c: any) => c.homeAway === 'away')
+      
+      if (!homeCompetitor || !awayCompetitor) continue
 
       // Mapear status
-      const statusMap: Record<string, string> = {
-        'TBD': 'scheduled', 'NS': 'scheduled',
-        '1H': 'live', 'HT': 'live', '2H': 'live', 'ET': 'live', 'P': 'live', 'BT': 'live',
-        'FT': 'finished', 'AET': 'finished', 'PEN': 'finished',
-        'SUSP': 'cancelled', 'INT': 'cancelled', 'PST': 'scheduled',
+      const stateStr = event.status.type.state // 'pre', 'in', 'post'
+      let status = 'scheduled'
+      if (stateStr === 'in') status = 'live'
+      if (stateStr === 'post') status = 'finished'
+      
+      // Manejar cancelados/pospuestos
+      const statusName = event.status.type.name.toLowerCase()
+      if (statusName.includes('canceled') || statusName.includes('postponed')) {
+        status = 'cancelled'
       }
 
-      // Mapear phase
-      const roundStr = (league.round ?? '').toLowerCase()
+      // Fase básica
       let phase = 'group'
-      if (roundStr.includes('final') && !roundStr.includes('round') && !roundStr.includes('semi') && !roundStr.includes('quarter')) {
-        phase = 'final'
-      } else if (roundStr.includes('semi')) {
-        phase = 'semi_final'
-      } else if (roundStr.includes('quarter')) {
-        phase = 'quarter_final'
-      } else if (roundStr.includes('round of 16')) {
-        phase = 'round_of_16'
-      } else if (roundStr.includes('round of 32')) {
-        phase = 'round_of_32'
-      } else if (roundStr.includes('3rd')) {
-        phase = 'third_place'
-      }
+      const eventName = event.name?.toLowerCase() || ''
+      if (eventName.includes('final') && !eventName.includes('quarter') && !eventName.includes('semi')) phase = 'final'
+      else if (eventName.includes('semi')) phase = 'semi_final'
+      else if (eventName.includes('quarter')) phase = 'quarter_final'
+      else if (eventName.includes('round of 16') || eventName.includes('octavos')) phase = 'round_of_16'
 
       const payload = {
-        api_match_id: String(f.id),
-        match_date:   f.date,
-        team_home:    teams.home.name,
-        team_away:    teams.away.name,
-        stadium:      f.venue?.name,
-        city_venue:   f.venue?.city,
-        status:       statusMap[f.status?.short ?? 'NS'] ?? 'scheduled',
-        score_home:   goals.home,
-        score_away:   goals.away,
+        api_match_id: String(event.id),
+        match_date:   event.date,
+        team_home:    homeCompetitor.team.name,
+        team_away:    awayCompetitor.team.name,
+        flag_home:    homeCompetitor.team.logo || null,
+        flag_away:    awayCompetitor.team.logo || null,
+        stadium:      comp.venue?.fullName || null,
+        city_venue:   comp.venue?.address?.city || null,
+        status:       status,
+        score_home:   homeCompetitor.score !== undefined ? parseInt(homeCompetitor.score) : null,
+        score_away:   awayCompetitor.score !== undefined ? parseInt(awayCompetitor.score) : null,
         phase,
-        is_locked:    ['live', 'finished'].includes(statusMap[f.status?.short ?? 'NS'] ?? ''),
+        is_locked:    ['live', 'finished'].includes(status),
       }
 
       const { data: existing } = await supabase
@@ -102,7 +91,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      total: fixtures.length,
+      total: events.length,
       inserted,
       updated,
     })
