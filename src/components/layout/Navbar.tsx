@@ -28,12 +28,27 @@ export default function Navbar() {
     const getUser = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('users')
           .select('*')
           .eq('id', authUser.id)
-          .single()
-        setUser(data)
+          .maybeSingle()
+          
+        if (data) {
+          setUser(data)
+        } else {
+          // El usuario está en auth pero su fila en 'users' fue borrada
+          setUser({
+            id: authUser.id,
+            nombre: 'Error de Perfil',
+            apellido: '',
+            email: authUser.email || '',
+            total_points: 0,
+            status: 'active',
+            role: 'user',
+            created_at: new Date().toISOString()
+          })
+        }
       }
     }
     getUser()
@@ -46,8 +61,22 @@ export default function Navbar() {
             .from('users')
             .select('*')
             .eq('id', session.user.id)
-            .single()
-          setUser(data)
+            .maybeSingle()
+            
+          if (data) {
+            setUser(data)
+          } else {
+            setUser({
+              id: session.user.id,
+              nombre: 'Error de Perfil',
+              apellido: '',
+              email: session.user.email || '',
+              total_points: 0,
+              status: 'active',
+              role: 'user',
+              created_at: new Date().toISOString()
+            })
+          }
         } else {
           setUser(null)
         }
