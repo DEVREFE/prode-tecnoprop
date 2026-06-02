@@ -432,10 +432,25 @@ CREATE POLICY "actualizar_prediccion" ON public.predictions
 CREATE POLICY "special_pred_propias" ON public.special_predictions
   FOR ALL USING (user_id = auth.uid());
 
+-- ================================================================
+-- FUNCIÓN: comprobar si un usuario es miembro de una liga
+-- ================================================================
+
+CREATE OR REPLACE FUNCTION public.is_league_member(p_league_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.league_members
+    WHERE league_id = p_league_id AND user_id = auth.uid()
+  );
+$$;
+
 -- LEAGUES: lectura según visibilidad, creación solo usuarios activos
 CREATE POLICY "ver_ligas_publicas" ON public.leagues
   FOR SELECT USING (is_public = TRUE OR owner_id = auth.uid() OR
-    EXISTS (SELECT 1 FROM public.league_members WHERE league_id = id AND user_id = auth.uid())
+    public.is_league_member(id)
   );
 
 CREATE POLICY "crear_liga" ON public.leagues
@@ -454,7 +469,7 @@ CREATE POLICY "borrar_propia_liga" ON public.leagues
 CREATE POLICY "ver_miembros" ON public.league_members
   FOR SELECT USING (
     user_id = auth.uid() OR
-    EXISTS (SELECT 1 FROM public.league_members lm2 WHERE lm2.league_id = league_id AND lm2.user_id = auth.uid())
+    public.is_league_member(league_id)
   );
 
 CREATE POLICY "unirse_liga" ON public.league_members
