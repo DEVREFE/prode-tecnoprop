@@ -1,12 +1,15 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Llamar con: GET /api/sync-matches?secret=SUPABASE_SERVICE_ROLE_KEY
+// Llamar con: GET /api/sync-matches?secret=TU_SECRETO
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
   const secretParam = request.nextUrl.searchParams.get('secret')
   
-  if (authHeader !== `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` && secretParam !== process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  const isValidAuth = authHeader === `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+  const isValidSecret = secretParam === process.env.SUPABASE_SERVICE_ROLE_KEY || secretParam === process.env.API_FOOTBALL_KEY
+  
+  if (!isValidAuth && !isValidSecret) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 
