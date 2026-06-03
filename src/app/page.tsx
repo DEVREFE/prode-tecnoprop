@@ -38,10 +38,10 @@ async function getHomeData() {
 }
 
 const PRIZES = [
-  { place: '1° Lugar', icon: '🥇', value: '$100.000', desc: 'en servicios Tecnoprop', featured: true },
-  { place: '2° Lugar', icon: '🥈', value: '$50.000',  desc: 'en servicios Tecnoprop', featured: false },
-  { place: '3° Lugar', icon: '🥉', value: '$25.000',  desc: 'en servicios Tecnoprop', featured: false },
-  { place: 'Sorpresa', icon: '🎁', value: '???',       desc: 'Premio especial',        featured: false },
+  { place: '1° Lugar', icon: '🥇', value: '+ de $300.000', desc: 'en premios + descuento para vender su propiedad', featured: true },
+  { place: '2° Lugar', icon: '🥈', value: '+ de $250.000',  desc: 'en premios + descuento para vender su propiedad', featured: false },
+  { place: '3° Lugar', icon: '🥉', value: 'Más de $150.000',  desc: 'en premios + descuento para vender su propiedad', featured: false },
+  { place: 'Sorpresa', icon: '🎁', value: '???',       desc: 'Muchos premios semanales y sorpresas',        featured: false },
 ]
 
 const POINTS = [
@@ -112,8 +112,8 @@ export default async function HomePage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { icon: Users,  value: formatNumber(usersCount || 1247), label: 'Participantes', color: 'text-celeste' },
-            { icon: Trophy, value: '48',   label: 'Partidos',    color: 'text-gold' },
-            { icon: Star,   value: '4',    label: 'Premios',     color: 'text-green-400' },
+            { icon: Trophy, value: '104',   label: 'Partidos',    color: 'text-gold' },
+            { icon: Star,   value: '+10',    label: 'Premios',     color: 'text-green-400' },
             { icon: Zap,    value: '100%', label: 'Gratis',      color: 'text-celeste' },
           ].map(stat => (
             <div key={stat.label} className="glass-card p-4 text-center group">

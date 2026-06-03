@@ -111,6 +111,7 @@ function RegisterContent() {
       instagram_handle: igHandle,
       instagram_confirmed: data.instagram_confirmed,
       ciudad: data.ciudad,
+      status: 'active'
     }
 
     const { error: profileError } = await supabase
