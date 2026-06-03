@@ -139,12 +139,13 @@ export default function PartidosClient({ matches, userId, specialPred }: Partido
                 <div className="text-4xl mb-4">⚽</div>
                 <p className="text-white/40">No hay partidos en esta categoría</p>
               </div>
-            ) : phaseFilter === 'group' || (statusTab === 'all' && phaseFilter === 'all') ? (
-              // Agrupar por grupo si estamos viendo fase de grupos o todo
+            ) : (phaseFilter === 'group' || phaseFilter === 'all') && filtered.some((m: any) => m.group_name) ? (
+              // Agrupar por grupo si hay partidos con grupo y estamos viendo todo o fase de grupos
               <div className="space-y-8">
                 {Object.entries(
                   filtered.reduce((acc: any, match: any) => {
-                    const g = match.group_name || 'Sin grupo'
+                    // Si no tiene grupo, lo agrupamos por su fase (ej. "Octavos de Final")
+                    const g = match.group_name || PHASE_LABELS[match.phase as keyof typeof PHASE_LABELS] || 'Fase Eliminatoria'
                     if (!acc[g]) acc[g] = []
                     acc[g].push(match)
                     return acc
