@@ -7,6 +7,17 @@ export default async function RankingPage() {
 
   const { data: { user: authUser } } = await supabase.auth.getUser()
 
+  // Perfil del usuario para el Navbar
+  let userProfile = null
+  if (authUser) {
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authUser.id)
+      .maybeSingle()
+    userProfile = data
+  }
+
   // Ranking general top 100
   const { data: ranking } = await supabase
     .from('ranking_general')
@@ -32,7 +43,7 @@ export default async function RankingPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar initialUser={userProfile} />
       <RankingClient
         initialRanking={ranking ?? []}
         myEntry={myEntry}

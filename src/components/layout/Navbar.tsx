@@ -14,17 +14,21 @@ const NAV_LINKS = [
   { href: '/ligas',    label: 'Mis Ligas' },
 ]
 
-export default function Navbar() {
+interface NavbarProps {
+  initialUser?: UserType | null
+}
+
+export default function Navbar({ initialUser }: NavbarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const [user, setUser] = useState<UserType | null>(null)
+  const [user, setUser] = useState<UserType | null>(initialUser ?? null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
 
-    // Obtener usuario actual
+    // Solo obtener usuario si no tenemos uno del servidor
     const getUser = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
@@ -49,6 +53,9 @@ export default function Navbar() {
             created_at: new Date().toISOString()
           } as UserType)
         }
+      } else if (!initialUser) {
+        // Solo limpiar si no teníamos un usuario del servidor
+        setUser(null)
       }
     }
     getUser()

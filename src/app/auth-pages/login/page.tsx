@@ -51,8 +51,8 @@ function LoginContent() {
     }
 
     toast.success('¡Bienvenido! 🎉')
-    router.push(next)
     router.refresh()
+    router.push(next)
   }
 
   const handleForgotPassword = async () => {

@@ -56,9 +56,22 @@ const POINTS = [
 export default async function HomePage() {
   const { matches, ranking, usersCount } = await getHomeData()
 
+  // Obtener usuario para el Navbar
+  const supabase = await createClient()
+  const { data: { user: authUser } } = await supabase.auth.getUser()
+  let userProfile = null
+  if (authUser) {
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authUser.id)
+      .maybeSingle()
+    userProfile = data
+  }
+
   return (
     <>
-      <Navbar />
+      <Navbar initialUser={userProfile} />
 
       {/* ── HERO ── */}
       <section className="relative overflow-hidden">

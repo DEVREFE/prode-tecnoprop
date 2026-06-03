@@ -9,6 +9,13 @@ export default async function LigasPage() {
   const { data: { user: authUser } } = await supabase.auth.getUser()
   if (!authUser) redirect('/login?next=/ligas')
 
+  // Perfil del usuario para el Navbar
+  const { data: userProfile } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', authUser.id)
+    .maybeSingle()
+
   // Mis ligas (creadas + unido)
   const { data: myLeagues } = await supabase
     .from('league_members')
@@ -23,7 +30,7 @@ export default async function LigasPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar initialUser={userProfile} />
       <LigasClient
         myLeagues={myLeagues ?? []}
         userId={authUser.id}

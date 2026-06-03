@@ -12,7 +12,7 @@ export default async function AdminPage() {
   // Verificar que sea admin
   const { data: profile } = await supabase
     .from('users')
-    .select('role')
+    .select('*')
     .eq('id', authUser.id)
     .single()
 
@@ -42,7 +42,7 @@ export default async function AdminPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar initialUser={profile} />
       <AdminClient
         matches={matches ?? []}
         users={users ?? []}

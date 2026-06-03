@@ -7,6 +7,17 @@ export default async function PartidosPage() {
 
   const { data: { user: authUser } } = await supabase.auth.getUser()
 
+  // Perfil del usuario para el Navbar
+  let userProfile = null
+  if (authUser) {
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authUser.id)
+      .maybeSingle()
+    userProfile = data
+  }
+
   // Todos los partidos
   const { data: matches } = await supabase
     .from('matches')
@@ -48,7 +59,7 @@ export default async function PartidosPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar initialUser={userProfile} />
       <PartidosClient
         matches={matchesWithPreds}
         userId={authUser?.id}

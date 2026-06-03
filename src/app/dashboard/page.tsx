@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   if (profile.status === 'pending_verification') {
     return (
       <>
-        <Navbar />
+        <Navbar initialUser={profile} />
         <main className="min-h-screen flex items-center justify-center px-4">
           <div className="glass-card p-8 max-w-md w-full text-center" style={{ position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, #36A9E0, #1D70B7)' }} />
@@ -85,7 +85,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar initialUser={profile} />
       <DashboardClient
         profile={profile}
         predictions={predictions ?? []}
