@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
         score_home:   homeCompetitor.score !== undefined ? parseInt(homeCompetitor.score) : null,
         score_away:   awayCompetitor.score !== undefined ? parseInt(awayCompetitor.score) : null,
         phase,
-        group_name,
+        group_name:   groupName,
         is_locked:    ['live', 'finished'].includes(status),
       }
 
