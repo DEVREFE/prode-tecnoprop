@@ -24,6 +24,21 @@ export async function GET(request: NextRequest) {
 
     const jsonRes = await apiRes.json()
     const events = jsonRes.events || []
+    
+    // Obtener standings para mapear equipos a grupos
+    const standingsRes = await fetch('https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings', { next: { revalidate: 3600 } })
+    const standingsData = await standingsRes.json()
+    
+    // Construir mapeo teamId -> groupName ("Grupo A", "Grupo B", etc.)
+    const teamGroupMap: Record<string, string> = {}
+    for (const group of standingsData.children || []) {
+      for (const entry of group.standings?.entries || []) {
+        if (entry.team?.id && group.name) {
+          teamGroupMap[entry.team.id] = group.name.replace('Group ', 'Grupo ')
+        }
+      }
+    }
+
     const supabase = createAdminClient()
 
     let updated = 0
@@ -50,13 +65,19 @@ export async function GET(request: NextRequest) {
         status = 'cancelled'
       }
 
-      // Fase básica
+      // Fase basada en season.slug (mucho más confiable que el nombre)
       let phase = 'group'
-      const eventName = event.name?.toLowerCase() || ''
-      if (eventName.includes('final') && !eventName.includes('quarter') && !eventName.includes('semi')) phase = 'final'
-      else if (eventName.includes('semi')) phase = 'semi_final'
-      else if (eventName.includes('quarter')) phase = 'quarter_final'
-      else if (eventName.includes('round of 16') || eventName.includes('octavos')) phase = 'round_of_16'
+      const slug = event.season?.slug || ''
+      if (slug === 'round-of-32') phase = 'round_of_32'
+      else if (slug === 'round-of-16') phase = 'round_of_16'
+      else if (slug === 'quarterfinals') phase = 'quarter_final'
+      else if (slug === 'semifinals') phase = 'semi_final'
+      else if (slug === '3rd-place') phase = 'third_place'
+      else if (slug === 'final') phase = 'final'
+      
+      // Grupo (solo si es fase de grupos, o si lo encontramos en el mapeo)
+      const homeId = homeCompetitor.id || homeCompetitor.team?.id?.toString()
+      const groupName = teamGroupMap[homeId] || null
 
       const payload = {
         api_match_id: String(event.id),
@@ -71,6 +92,7 @@ export async function GET(request: NextRequest) {
         score_home:   homeCompetitor.score !== undefined ? parseInt(homeCompetitor.score) : null,
         score_away:   awayCompetitor.score !== undefined ? parseInt(awayCompetitor.score) : null,
         phase,
+        group_name,
         is_locked:    ['live', 'finished'].includes(status),
       }
 

@@ -133,13 +133,52 @@ export default function PartidosClient({ matches, userId, specialPred }: Partido
               )}
             </div>
 
-            {/* Grid de partidos */}
+            {/* Grid de partidos / Agrupados */}
             {filtered.length === 0 ? (
               <div className="text-center py-16">
                 <div className="text-4xl mb-4">⚽</div>
                 <p className="text-white/40">No hay partidos en esta categoría</p>
               </div>
+            ) : phaseFilter === 'group' || (statusTab === 'all' && phaseFilter === 'all') ? (
+              // Agrupar por grupo si estamos viendo fase de grupos o todo
+              <div className="space-y-8">
+                {Object.entries(
+                  filtered.reduce((acc: any, match: any) => {
+                    const g = match.group_name || 'Sin grupo'
+                    if (!acc[g]) acc[g] = []
+                    acc[g].push(match)
+                    return acc
+                  }, {})
+                )
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([groupName, groupMatches]: [string, any]) => (
+                  <div key={groupName} className="space-y-3">
+                    <h2 className="text-sm font-bold tracking-widest uppercase text-white/50 mb-2 pl-1 border-l-2 border-celeste/50 flex items-center gap-2">
+                      {groupName}
+                      <span className="text-[10px] text-white/20 font-normal normal-case">
+                        {groupMatches.length} partidos
+                      </span>
+                    </h2>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {groupMatches.map((match: any) => (
+                        <MatchCard
+                          key={match.id}
+                          match={{
+                            ...match,
+                            prediction: localPreds[match.id]
+                              ? { ...match.prediction, ...localPreds[match.id] }
+                              : match.prediction
+                          }}
+                          userId={userId}
+                          onPredictionSaved={handlePredictionSaved}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : (
+              // Lista plana para eliminatorias
               <div className="grid sm:grid-cols-2 gap-3">
                 {filtered.map((match: any) => (
                   <MatchCard
