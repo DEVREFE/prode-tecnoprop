@@ -102,7 +102,7 @@ function RegisterContent() {
     }
 
     // Crear perfil en tabla users
-    const profilePayload: Partial<RegisterFormData> & { id: string; email: string } = {
+    const profilePayload: Partial<RegisterFormData> & { id: string; email: string; status?: string } = {
       id: authData.user.id,
       nombre: data.nombre,
       apellido: data.apellido,
