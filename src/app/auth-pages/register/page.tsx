@@ -41,7 +41,6 @@ function RegisterContent() {
   const refCode = searchParams.get('ref')
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [done, setDone] = useState(false)
 
   const {
     register,
@@ -147,31 +146,11 @@ function RegisterContent() {
       router.push('/dashboard')
       router.refresh()
     } else {
-      setDone(true)
+      toast.error('Error inesperado al crear la sesión. Intentá iniciar sesión.')
+      router.push('/login')
     }
   }
 
-  if (done) {
-    return (
-      <main className="min-h-screen flex items-center justify-center px-4">
-        <div className="glass-card p-8 max-w-md w-full text-center top-accent">
-          <div className="text-5xl mb-4">📧</div>
-          <h1 className="text-2xl font-extrabold mb-3">¡Revisá tu email!</h1>
-          <p className="text-white/60 mb-6 leading-relaxed">
-            Te enviamos un link de confirmación. Hacé click en el link para activar
-            tu cuenta y empezar a pronosticar.
-          </p>
-          <div className="bg-celeste/[0.06] border border-celeste/15 rounded-xl p-4 text-sm text-white/60 mb-6">
-            El link expira en <span className="text-white font-semibold">24 horas</span>.
-            Si no lo encontrás, revisá la carpeta de spam.
-          </div>
-          <Link href="/" className="btn-ghost block text-center text-sm">
-            Volver al inicio
-          </Link>
-        </div>
-      </main>
-    )
-  }
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4 py-12">

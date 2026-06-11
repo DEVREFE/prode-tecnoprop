@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { Plus, Copy, Users, Trophy, X, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -29,24 +28,14 @@ export default function LigasClient({ myLeagues, userId }: LigasClientProps) {
     if (!newName.trim()) { toast.error('Ingresá un nombre para la liga'); return }
     setCreating(true)
     try {
-      const supabase = createClient()
-      
-      // Insertar liga y devolver el ID creado
-      const { data: league, error } = await supabase.from('leagues').insert({
-        name: newName.trim(),
-        description: newDesc.trim() || null,
-        owner_id: userId,
-      } as any).select('id').single()
-      
-      if (error) throw error
-
-      // También agregar al creador como miembro
-      if (league) {
-        const { error: memberError } = await supabase.from('league_members').insert({ 
-          league_id: (league as any).id, 
-          user_id: userId 
-        } as any)
-        if (memberError) throw memberError
+      const res = await fetch('/api/ligas/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newName.trim(), description: newDesc.trim() || null }),
+      })
+      const data = await res.json()
+      if (!res.ok) { 
+        throw new Error(data.error || 'Error al crear la liga') 
       }
 
       toast.success('¡Liga creada!')

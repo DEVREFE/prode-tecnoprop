@@ -18,29 +18,6 @@ export default async function DashboardPage() {
 
   if (!profile) redirect('/login')
 
-  // Email sin verificar → mostrar pantalla de verificación
-  if (profile.status === 'pending_verification') {
-    return (
-      <>
-        <Navbar initialUser={profile} />
-        <main className="min-h-screen flex items-center justify-center px-4">
-          <div className="glass-card p-8 max-w-md w-full text-center" style={{ position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg, #36A9E0, #1D70B7)' }} />
-            <div className="text-5xl mb-4">📧</div>
-            <h1 className="text-2xl font-extrabold mb-3">Confirmá tu email</h1>
-            <p className="text-white/50 mb-6 leading-relaxed">
-              Te enviamos un link de activación a{' '}
-              <span className="text-white font-semibold">{profile.email}</span>.
-              Hacé click en el link para activar tu cuenta.
-            </p>
-            <p className="text-xs text-white/25">
-              ¿No llegó? Revisá spam o escribinos al WhatsApp 381 5462052
-            </p>
-          </div>
-        </main>
-      </>
-    )
-  }
 
   // Mis predicciones con datos del partido
   const { data: predictions } = await supabase

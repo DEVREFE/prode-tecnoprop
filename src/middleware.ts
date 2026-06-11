@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) {
   // Rutas protegidas que requieren autenticación
   const protectedPaths = ['/dashboard', '/partidos', '/ranking', '/ligas']
   const adminPaths = ['/admin']
-  const authPaths = ['/login', '/register', '/verify']
+  const authPaths = ['/login', '/register']
 
   const isProtected = protectedPaths.some(p => pathname.startsWith(p))
   const isAdmin = adminPaths.some(p => pathname.startsWith(p))

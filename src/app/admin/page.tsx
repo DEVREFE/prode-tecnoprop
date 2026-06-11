@@ -35,8 +35,8 @@ export default async function AdminPage() {
   // Conteos
   const { count: totalActive } = await supabase
     .from('users').select('id', { count: 'exact', head: true }).eq('status', 'active')
-  const { count: totalPending } = await supabase
-    .from('users').select('id', { count: 'exact', head: true }).eq('status', 'pending_verification')
+  const { count: totalUsers } = await supabase
+    .from('users').select('id', { count: 'exact', head: true })
   const { count: totalPreds } = await supabase
     .from('predictions').select('id', { count: 'exact', head: true })
 
@@ -48,7 +48,7 @@ export default async function AdminPage() {
         users={users ?? []}
         stats={{
           totalActive: totalActive ?? 0,
-          totalPending: totalPending ?? 0,
+          totalUsers: totalUsers ?? 0,
           totalPredictions: totalPreds ?? 0,
         }}
       />

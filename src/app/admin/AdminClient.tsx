@@ -15,7 +15,7 @@ const TABS = [
 interface AdminClientProps {
   matches: any[]
   users: any[]
-  stats: { totalActive: number; totalPending: number; totalPredictions: number }
+  stats: { totalActive: number; totalUsers: number; totalPredictions: number }
 }
 
 export default function AdminClient({ matches, users, stats }: AdminClientProps) {
@@ -59,7 +59,7 @@ export default function AdminClient({ matches, users, stats }: AdminClientProps)
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
             { label: 'Usuarios activos',    value: formatNumber(stats.totalActive),      color: 'text-green-400' },
-            { label: 'Sin verificar',        value: formatNumber(stats.totalPending),     color: 'text-yellow-400' },
+            { label: 'Total registrados',    value: formatNumber(stats.totalUsers),       color: 'text-yellow-400' },
             { label: 'Pronósticos totales',  value: formatNumber(stats.totalPredictions), color: 'text-celeste' },
           ].map(s => (
             <div key={s.label} className="glass-card p-4 text-center">
