@@ -6,8 +6,18 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
 
-  if (!process.env.SYNC_SECRET || authHeader !== `Bearer ${process.env.SYNC_SECRET}`) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  // Diagnóstico: distinguir "no hay secret en el server" de "no coincide"
+  if (!process.env.SYNC_SECRET) {
+    return NextResponse.json(
+      { error: 'SYNC_SECRET no está configurada en Vercel (o el deploy no la tomó)' },
+      { status: 401 }
+    )
+  }
+  if (authHeader !== `Bearer ${process.env.SYNC_SECRET}`) {
+    return NextResponse.json(
+      { error: 'El secret enviado no coincide con SYNC_SECRET de Vercel' },
+      { status: 401 }
+    )
   }
 
   try {
