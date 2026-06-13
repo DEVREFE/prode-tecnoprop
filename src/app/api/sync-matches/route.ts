@@ -6,18 +6,16 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
 
-  // Diagnóstico: distinguir "no hay secret en el server" de "no coincide"
-  if (!process.env.SYNC_SECRET) {
-    return NextResponse.json(
-      { error: 'SYNC_SECRET no está configurada en Vercel (o el deploy no la tomó)' },
-      { status: 401 }
-    )
-  }
-  if (authHeader !== `Bearer ${process.env.SYNC_SECRET}`) {
-    return NextResponse.json(
-      { error: 'El secret enviado no coincide con SYNC_SECRET de Vercel' },
-      { status: 401 }
-    )
+  // El cron (GitHub Action) manda el secreto en el header Authorization
+  // (no en la URL, para que no quede en logs). Aceptamos el SERVICE_ROLE_KEY
+  // —que ya está configurado y coincide— o un SYNC_SECRET dedicado si existe.
+  const validTokens = [
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    process.env.SYNC_SECRET,
+  ].filter(Boolean).map(t => `Bearer ${t}`)
+
+  if (!authHeader || !validTokens.includes(authHeader)) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 
   try {
