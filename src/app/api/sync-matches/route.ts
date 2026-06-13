@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
 
     let updated = 0
     let inserted = 0
+    let scored = 0
 
     for (const event of events) {
       const comp = event.competitions[0]
@@ -98,12 +99,22 @@ export async function GET(request: NextRequest) {
 
       const { data: existing } = await supabase
         .from('matches')
-        .select('id')
+        .select('id, status')
         .eq('api_match_id', payload.api_match_id)
         .maybeSingle()
 
       if (existing) {
         await supabase.from('matches').update(payload).eq('id', existing.id)
+        // Si el partido pasó a 'finished', calcular puntos inmediatamente
+        if (status === 'finished' && payload.score_home !== null && payload.score_away !== null) {
+          const { data: count, error: scoreErr } = await supabase.rpc('score_match', { p_match_id: existing.id })
+          if (scoreErr) {
+            console.error(`[sync-matches] Error scoring match ${existing.id}:`, scoreErr.message)
+          } else if (count && count > 0) {
+            console.log(`[sync-matches] Scored ${count} predictions for match ${existing.id}`)
+            scored += count
+          }
+        }
         updated++
       } else {
         await supabase.from('matches').insert(payload)
@@ -111,11 +122,35 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // ── Catch-all: puntuar TODOS los partidos finalizados con predicciones pendientes ──
+    // Esto recupera puntos que no se calcularon por el bug anterior.
+    // score_match() es idempotente: solo procesa predictions con points_earned IS NULL
+    let catchAllScored = 0
+    try {
+      const { data: allFinished } = await supabase
+        .from('matches')
+        .select('id')
+        .eq('status', 'finished')
+        .not('score_home', 'is', null)
+        .not('score_away', 'is', null)
+
+      for (const match of allFinished ?? []) {
+        const { data: count, error: scoreErr } = await supabase.rpc('score_match', { p_match_id: match.id })
+        if (!scoreErr && count && count > 0) {
+          catchAllScored += count
+        }
+      }
+    } catch (e: any) {
+      console.error('[sync-matches] Catch-all scoring error:', e.message)
+    }
+
     return NextResponse.json({
       success: true,
       total: events.length,
       inserted,
       updated,
+      scored,
+      catchAllScored,
     })
 
   } catch (err: any) {

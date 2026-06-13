@@ -165,6 +165,29 @@ export async function GET(request: NextRequest) {
     results.reminders = { error: e.message }
   }
 
+  // ── 4. Catch-all: puntuar partidos finalizados sin procesar ────
+  // Seguro de ejecutar múltiples veces — score_match solo procesa
+  // predictions con points_earned IS NULL
+  try {
+    const { data: allFinished } = await supabase
+      .from('matches')
+      .select('id')
+      .eq('status', 'finished')
+      .not('score_home', 'is', null)
+      .not('score_away', 'is', null)
+
+    let catchAllScored = 0
+    for (const match of allFinished ?? []) {
+      const { data: count, error: scoreErr } = await supabase.rpc('score_match', { p_match_id: match.id })
+      if (!scoreErr && count && count > 0) {
+        catchAllScored += count
+      }
+    }
+    results.catch_all_scoring = { checked: allFinished?.length ?? 0, scored: catchAllScored }
+  } catch (e: any) {
+    results.catch_all_scoring = { error: e.message }
+  }
+
   return NextResponse.json({ ok: true, timestamp: new Date().toISOString(), results })
 }
 
