@@ -64,13 +64,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (referral && !referral.points_awarded) {
-      // Dar punto al que refirió
-      await supabase
-        .from('users')
-        .update({ total_points: supabase.rpc('total_points + 1' as any) })
-        .eq('id', profile.referred_by)
-
-      // Más limpio: usar UPDATE directo
+      // Sumar el punto de referido al referente (función SECURITY DEFINER)
       await supabase.rpc('apply_referral_bonus' as any, { p_referrer_id: profile.referred_by })
 
       // Marcar como pagado

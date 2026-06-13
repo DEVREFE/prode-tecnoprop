@@ -1,15 +1,13 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Llamar con: GET /api/sync-matches?secret=TU_SECRETO
+// Agendá un cron externo (ej. cron-job.org) cada 2-5 min apuntando a
+// GET /api/sync-matches con el header:  Authorization: Bearer <CRON_SECRET>
+// Vercel Cron envía ese header automáticamente si CRON_SECRET está seteado.
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
-  const secretParam = request.nextUrl.searchParams.get('secret')
-  
-  const isValidAuth = authHeader === `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
-  const isValidSecret = secretParam === process.env.SUPABASE_SERVICE_ROLE_KEY || secretParam === process.env.API_FOOTBALL_KEY || secretParam === process.env.SYNC_SECRET
-  
-  if (!isValidAuth && !isValidSecret) {
+
+  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 

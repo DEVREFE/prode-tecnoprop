@@ -25,9 +25,8 @@ async function getHomeData() {
       .select('*')
       .limit(5),
     supabase
-      .from('users')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'active'),
+      .from('ranking_general')
+      .select('id', { count: 'exact', head: true }),
   ])
 
   return {

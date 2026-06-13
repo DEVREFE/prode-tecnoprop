@@ -369,7 +369,6 @@ SELECT
   u.ciudad,
   u.instagram_handle,
   u.total_points,
-  u.referral_code,
   ROW_NUMBER() OVER (ORDER BY u.total_points DESC, u.created_at ASC) AS position,
   COUNT(p.id) FILTER (WHERE p.points_earned = 3) AS exact_results,
   COUNT(p.id) FILTER (WHERE p.points_earned > 0) AS correct_results,
@@ -392,9 +391,26 @@ ALTER TABLE public.league_members    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.points_log        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.referrals         ENABLE ROW LEVEL SECURITY;
 
--- USERS: cualquiera puede ver perfiles básicos, solo vos podés editar el tuyo
-CREATE POLICY "perfiles_publicos" ON public.users
-  FOR SELECT USING (TRUE);
+-- Helper: ¿el usuario actual es admin? (SECURITY DEFINER evita recursión RLS)
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = ''
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'
+  );
+$$;
+
+-- USERS: solo podés leer tu propia fila (+ admins). Los datos públicos
+-- (ranking, landing) salen de la vista ranking_general, que no expone
+-- email/whatsapp/referral_code. Ver security-fix-pii.sql para detalles.
+CREATE POLICY "leer_perfil_propio" ON public.users
+  FOR SELECT USING (
+    auth.uid() = id OR public.is_admin()
+  );
 
 CREATE POLICY "editar_propio_perfil" ON public.users
   FOR UPDATE USING (auth.uid() = id);

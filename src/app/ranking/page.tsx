@@ -35,11 +35,10 @@ export default async function RankingPage() {
     myEntry = data
   }
 
-  // Total de participantes activos
+  // Total de participantes activos (vía vista pública, no exponemos users)
   const { count } = await supabase
-    .from('users')
+    .from('ranking_general')
     .select('id', { count: 'exact', head: true })
-    .eq('status', 'active')
 
   return (
     <>

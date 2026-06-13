@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import MatchCard from '@/components/prode/MatchCard'
 import { PHASE_LABELS } from '@/types'
 import { cn } from '@/lib/utils'
@@ -50,6 +51,15 @@ export default function PartidosClient({ matches, userId, specialPred }: Partido
 
   // Contar live
   const liveCount = matches.filter((m: any) => m.status === 'live').length
+
+  // Auto-refresh liviano: si hay partidos en vivo, refrescar los datos del
+  // servidor cada 60s para ver scores actualizados sin recargar a mano.
+  const router = useRouter()
+  useEffect(() => {
+    if (liveCount === 0) return
+    const interval = setInterval(() => router.refresh(), 60_000)
+    return () => clearInterval(interval)
+  }, [liveCount, router])
 
   const handlePredictionSaved = (matchId: string, home: number, away: number) => {
     setLocalPreds(prev => ({ ...prev, [matchId]: { pred_home: home, pred_away: away } }))

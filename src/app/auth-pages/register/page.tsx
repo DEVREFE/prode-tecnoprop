@@ -58,14 +58,12 @@ function RegisterContent() {
     const supabase = createClient()
     const igHandle = normalizeInstagram(data.instagram_handle)
 
-    // Verificar si el instagram ya está registrado
-    const { data: existingIg } = await supabase
-      .from('users')
-      .select('id')
-      .eq('instagram_handle', igHandle)
-      .maybeSingle()
+    // Verificar si el instagram ya está registrado (RPC SECURITY DEFINER:
+    // no exponemos la tabla users a usuarios anónimos)
+    const { data: disponible } = await supabase
+      .rpc('instagram_disponible', { p_handle: igHandle })
 
-    if (existingIg) {
+    if (disponible === false) {
       toast.error('Este Instagram ya está registrado en el prode')
       setLoading(false)
       return
@@ -124,17 +122,15 @@ function RegisterContent() {
       return
     }
 
-    // Procesar referido si existe
+    // Procesar referido si existe (RPC SECURITY DEFINER resuelve el id
+    // del referente a partir de su código)
     if (refCode) {
-      const { data: referrer } = await supabase
-        .from('users')
-        .select('id')
-        .eq('referral_code', refCode)
-        .maybeSingle()
+      const { data: referrerId } = await supabase
+        .rpc('resolver_referido', { p_code: refCode })
 
-      if (referrer) {
+      if (referrerId) {
         await supabase.from('referrals').insert({
-          referrer_id: (referrer as any).id,
+          referrer_id: referrerId as string,
           referred_id: authData.user.id,
         } as any)
       }

@@ -12,4 +12,5 @@ jobs:
     steps:
       - name: Llamar al endpoint de sync-matches
         run: |
-          curl -f -X GET "https://prode.tecnoprop.ar/api/sync-matches?secret=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+          curl -f -X GET "https://prode.tecnoprop.ar/api/sync-matches" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
