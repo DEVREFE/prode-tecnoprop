@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const secretParam = request.nextUrl.searchParams.get('secret')
   
   const isValidAuth = authHeader === `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
-  const isValidSecret = secretParam === process.env.SUPABASE_SERVICE_ROLE_KEY || secretParam === process.env.API_FOOTBALL_KEY
+  const isValidSecret = secretParam === process.env.SUPABASE_SERVICE_ROLE_KEY || secretParam === process.env.API_FOOTBALL_KEY || secretParam === process.env.SYNC_SECRET
   
   if (!isValidAuth && !isValidSecret) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
