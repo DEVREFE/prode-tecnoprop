@@ -1,13 +1,12 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Agendá un cron externo (ej. cron-job.org) cada 2-5 min apuntando a
-// GET /api/sync-matches con el header:  Authorization: Bearer <CRON_SECRET>
-// Vercel Cron envía ese header automáticamente si CRON_SECRET está seteado.
+// Lo llama el GitHub Action (cada 5 min) con el header:
+//   Authorization: Bearer <SYNC_SECRET>
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
 
-  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.SYNC_SECRET || authHeader !== `Bearer ${process.env.SYNC_SECRET}`) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 

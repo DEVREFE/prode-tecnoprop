@@ -13,4 +13,4 @@ jobs:
       - name: Llamar al endpoint de sync-matches
         run: |
           curl -f -X GET "https://prode.tecnoprop.ar/api/sync-matches" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+            -H "Authorization: Bearer ${{ secrets.SYNC_SECRET }}"

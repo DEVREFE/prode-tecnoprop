@@ -48,7 +48,9 @@ CREATE POLICY "leer_perfil_propio" ON public.users
 -- ── 3. Recrear ranking_general SIN referral_code ────────────────
 -- La vista corre con privilegios del owner (postgres), por lo que
 -- sigue sirviendo el ranking público sin exponer la tabla users.
-CREATE OR REPLACE VIEW public.ranking_general AS
+-- DROP + CREATE: CREATE OR REPLACE no permite quitar columnas existentes.
+DROP VIEW IF EXISTS public.ranking_general;
+CREATE VIEW public.ranking_general AS
 SELECT
   u.id,
   u.nombre,
